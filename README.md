@@ -5,7 +5,7 @@
 
 -  http://127.0.0.1:8000/api/docs/#/
 -  http://127.0.0.1:8000/api/redoc/#/
-- Providing postman collection as well
+- Providing postman collection as well except ws:// endpoints (no getting export option of GRPC and websockets in postman)
 
 ### User Journey in short for single user 
 
