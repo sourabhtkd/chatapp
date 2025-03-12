@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  ceph-mon:
+    image: ceph/daemon:latest
+    container_name: ceph-mon
+    environment:
+      - CEPH_DAEMON=mon
+      - MON_IP=127.0.0.1
+      - CEPH_PUBLIC_NETWORK=0.0.0.0/0
+    volumes:
+      - ceph-mon-data:/var/lib/ceph/mon
+    networks:
+      - ceph-net
+
+  ceph-mgr:
+    image: ceph/daemon:latest
+    container_name: ceph-mgr
+    environment:
+      - CEPH_DAEMON=mgr
+    depends_on:
+      - ceph-mon
+    volumes:
+      - ceph-mgr-data:/var/lib/ceph/mgr
+    networks:
+      - ceph-net
+
+  ceph-osd:
+    image: ceph/daemon:latest
+    container_name: ceph-osd
+    environment:
+      - CEPH_DAEMON=osd
+    depends_on:
+      - ceph-mon
+    volumes:
+      - ceph-osd-data:/var/lib/ceph/osd
+    networks:
+      - ceph-net
+
+volumes:
+  ceph-mon-data:
+  ceph-mgr-data:
+  ceph-osd-data:
+
+networks:
+  ceph-net:
+    driver: bridge

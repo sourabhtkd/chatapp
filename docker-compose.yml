@@ -1,0 +1,60 @@
+#version: '3.8'
+
+services:
+  # Django application
+  web:
+    build: .
+#    command: daphne -b 0.0.0.0 -p 8000 core.asgi:application
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: web
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - REDIS_URL=redis://redis:6379/0
+    env_file: env
+
+    networks:
+      - chatnetwork
+    restart: always
+
+  # PostgreSQL database
+  db:
+    image: postgres:latest
+    container_name: db
+    hostname: db
+    env_file: env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5439:5432"
+    networks:
+      - chatnetwork
+
+    restart: always
+
+  # Redis for Django Channels
+  redis:
+    image: redis:6
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chatnetwork
+    restart: always
+
+# Volumes for persistent data
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  chatnetwork:
